@@ -35,7 +35,7 @@ function RestaurantPage() {
   const { slug } = Route.useParams();
   const { data: restaurant, isLoading } = useRestaurant(slug);
   const { data: items } = useMenuItems(
-    restaurant?.id ? { restaurantId: restaurant.id } : { restaurantId: undefined },
+    restaurant?.id ? { restaurantId: restaurant.id } : {},
   );
   const addToCart = useAddToCart();
 
