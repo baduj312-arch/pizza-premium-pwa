@@ -2,12 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Receipt, Heart, ShieldCheck } from "lucide-react";
+import { LogOut, Receipt, Heart, ShieldCheck, MessageCircle } from "lucide-react";
 
 import { Screen, ScreenHeader } from "@/components/app/Screen";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/lib/api";
+import { WHATSAPP_NUMBER, whatsappLink } from "@/lib/contact";
+
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -92,7 +94,19 @@ function ProfilePage() {
         {isAdmin && (
           <Tile to="/admin" icon={<ShieldCheck className="size-5" />} label="Admin dashboard" />
         )}
+        <a
+          href={whatsappLink("Hello Ember! I have a question about my order.")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 rounded-2xl bg-card px-4 py-4"
+        >
+          <span className="text-success">
+            <MessageCircle className="size-5" />
+          </span>
+          <span className="text-sm font-semibold">Order help on WhatsApp · {WHATSAPP_NUMBER}</span>
+        </a>
       </nav>
+
 
       <button
         type="button"
