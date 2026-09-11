@@ -12,7 +12,7 @@ import {
   useRestaurants,
 } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { currency, num } from "@/lib/format";
 
