@@ -2,14 +2,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CreditCard, Banknote, Wallet } from "lucide-react";
+import { CreditCard, Banknote, Wallet, MessageCircle } from "lucide-react";
 
 import { Screen, ScreenHeader } from "@/components/app/Screen";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart, useCartTotals, useProfile, usePromotions } from "@/lib/api";
 import { currency, num } from "@/lib/format";
+import { WHATSAPP_NUMBER, whatsappLink } from "@/lib/contact";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({
@@ -186,9 +188,23 @@ function CheckoutPage() {
       >
         {count === 0 ? "Your bag is empty" : `Place order · ${currency(total)}`}
       </button>
+
+      <a
+        href={whatsappLink(
+          `Hello Ember! I'd like to order:\n${(cart ?? [])
+            .map((row) => `${row.quantity}× ${row.menu_items?.name ?? "Item"}`)
+            .join("\n")}\nTotal: ${currency(total)}\nAddress: ${address || "(to confirm)"}`,
+        )}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card py-4 text-sm font-semibold"
+      >
+        <MessageCircle className="size-4 text-success" /> Order on WhatsApp · {WHATSAPP_NUMBER}
+      </a>
     </Screen>
   );
 }
+
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (

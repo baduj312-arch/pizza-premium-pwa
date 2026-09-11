@@ -1,7 +1,12 @@
 export function currency(value: number | string | null | undefined) {
   const n = typeof value === "string" ? Number(value) : (value ?? 0);
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n || 0);
+  return new Intl.NumberFormat("en-GH", {
+    style: "currency",
+    currency: "GHS",
+    currencyDisplay: "narrowSymbol",
+  }).format(n || 0);
 }
+
 
 export function num(value: number | string | null | undefined) {
   const n = typeof value === "string" ? Number(value) : (value ?? 0);

@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Bike, ChefHat, Package, MapPin, Phone } from "lucide-react";
+import { Check, Bike, ChefHat, Package, MapPin, Phone, MessageCircle } from "lucide-react";
 
 import { Screen, ScreenHeader } from "@/components/app/Screen";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrder } from "@/lib/api";
 import { currency, ORDER_STATUSES, shortId, STATUS_LABEL } from "@/lib/format";
+import { WHATSAPP_NUMBER, whatsappLink } from "@/lib/contact";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
   head: () => ({
@@ -155,6 +157,18 @@ function TrackPage() {
               </span>
             </div>
           </div>
+
+          <a
+            href={whatsappLink(
+              `Hello Ember! I need help with order #${shortId(order.id)}.`,
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card py-4 text-sm font-semibold"
+          >
+            <MessageCircle className="size-4 text-success" /> Chat on WhatsApp · {WHATSAPP_NUMBER}
+          </a>
+
         </>
       )}
     </Screen>
