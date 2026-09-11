@@ -1,17 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Search, ShoppingBag, Heart, User } from "lucide-react";
+import { Bike, Search, ShoppingBag, Receipt, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useCart, useCartTotals } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 
 const items = [
-  { to: "/", label: "Home", icon: Home },
+  { to: "/", label: "Delivery", icon: Bike },
   { to: "/search", label: "Search", icon: Search },
-  { to: "/cart", label: "Bag", icon: ShoppingBag },
-  { to: "/favorites", label: "Saved", icon: Heart },
-  { to: "/profile", label: "You", icon: User },
+  { to: "/cart", label: "Cart", icon: ShoppingBag },
+  { to: "/orders", label: "Orders", icon: Receipt },
+  { to: "/profile", label: "Profile", icon: User },
 ] as const;
+
 
 export function BottomNav() {
   const { user } = useAuth();
