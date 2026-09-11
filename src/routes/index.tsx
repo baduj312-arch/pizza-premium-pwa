@@ -12,7 +12,7 @@ import {
   useRestaurants,
 } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { currency, num } from "@/lib/format";
 
@@ -79,37 +79,9 @@ function Home() {
         Search pizza, sushi, bowls…
       </button>
 
-      {/* Promotions */}
-      <section className="mt-7">
-        <div className="scrollbar-none -mx-5 flex gap-4 overflow-x-auto px-5 pb-1">
-          {(promos ?? []).slice(0, 4).map((p) => (
-            <article
-              key={p.id}
-              className="relative w-[280px] shrink-0 overflow-hidden rounded-3xl bg-card shadow-panel"
-            >
-              <img
-                src={p.image_url ?? "/images/pizza-pepperoni.jpg"}
-                alt={p.title}
-                loading="lazy"
-                width={1024}
-                height={768}
-                className="h-36 w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
-              <div className="absolute inset-0 flex flex-col justify-center p-4">
-                <span className="w-fit rounded-full ember-gradient px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                  {p.discount_percent}% off
-                </span>
-                <h3 className="mt-2 max-w-[10rem] font-display text-base font-bold leading-snug">
-                  {p.title}
-                </h3>
-                <p className="mt-1 text-xs text-muted-foreground">Code {p.code}</p>
-              </div>
-            </article>
-          ))}
-          {!promos && <Skeleton className="h-36 w-[280px] shrink-0 rounded-3xl" />}
-        </div>
-      </section>
+      {/* Promotions — auto-sliding tiles */}
+      <PromoSlider promos={promos} />
+
 
       {/* Categories */}
       <section className="mt-7">
@@ -205,5 +177,81 @@ function CategoryChip({
     >
       {label}
     </button>
+  );
+}
+
+function PromoSlider({ promos }: { promos: ReturnType<typeof usePromotions>["data"] }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const slides = (promos ?? []).slice(0, 4);
+
+  // Auto-advance the tiles, pausing while the user is dragging/scrolling.
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 4000);
+    return () => window.clearInterval(id);
+  }, [slides.length]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.children[index] as HTMLElement | undefined;
+    if (!card) return;
+    track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: "smooth" });
+  }, [index]);
+
+  return (
+    <section className="mt-7">
+      <div
+        ref={trackRef}
+        className="scrollbar-none -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1"
+      >
+        {slides.map((p) => (
+          <article
+            key={p.id}
+            className="relative w-[280px] shrink-0 snap-start overflow-hidden rounded-3xl bg-card shadow-panel"
+          >
+            <img
+              src={p.image_url ?? "/images/pizza-pepperoni.jpg"}
+              alt={p.title}
+              loading="lazy"
+              width={1024}
+              height={768}
+              className="h-36 w-full object-cover transition-transform duration-[6000ms] ease-out hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
+            <div className="absolute inset-0 flex flex-col justify-center p-4">
+              <span className="w-fit rounded-full ember-gradient px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
+                {p.discount_percent}% off
+              </span>
+              <h3 className="mt-2 max-w-[10rem] font-display text-base font-bold leading-snug">
+                {p.title}
+              </h3>
+              <p className="mt-1 text-xs text-muted-foreground">Code {p.code}</p>
+            </div>
+          </article>
+        ))}
+        {!promos && <Skeleton className="h-36 w-[280px] shrink-0 rounded-3xl" />}
+      </div>
+
+      {slides.length > 1 && (
+        <div className="mt-3 flex justify-center gap-1.5">
+          {slides.map((p, i) => (
+            <button
+              key={p.id}
+              type="button"
+              aria-label={`Show offer ${i + 1}`}
+              onClick={() => setIndex(i)}
+              className={cn(
+                "h-1.5 rounded-full transition-all",
+                i === index ? "w-6 bg-primary" : "w-1.5 bg-muted",
+              )}
+            />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
